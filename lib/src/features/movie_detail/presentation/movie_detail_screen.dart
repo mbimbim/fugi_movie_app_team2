@@ -346,12 +346,15 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       setState(() {
         isLoading = true;
       });
+      var resp = await DioClient().apiCall(
+        // url: '/movie/${widget.trending.id}',
+        url: '/movie/${widget.idAndObject!['id']}/credits',
+        requestType: RequestType.get,
+        queryParameters: {},
+      );
+      var respBody = resp.data;
 
-      var dio = Dio();
-      Response response = await dio.get(
-          'https://api.themoviedb.org/3/movie/${widget.idAndObject!['id']}/credits?api_key=0bdc72e416bdaf3386c89c511795fe9a&language=en-US');
-
-      responseListCast = response.data['cast'];
+      responseListCast = respBody['cast'];
 
       // List<Get_Cast> aa =
       //     responseListCast.map((e) => Get_Cast.fromJson(e)).toList();
