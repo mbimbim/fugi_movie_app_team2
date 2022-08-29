@@ -18,6 +18,7 @@ class Cast_card extends StatelessWidget {
         return Column(
           children: [
             Container(
+              margin: EdgeInsets.all(20),
               color: Colors.transparent,
               width: 110,
               height: 110,
