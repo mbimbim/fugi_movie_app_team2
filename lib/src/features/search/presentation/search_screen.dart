@@ -37,7 +37,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           appBar: AppBar(
             title: const Text('Search Results'),
             actions: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline)),
+              IconButton(
+                  onPressed: () {}, icon: const Icon(Icons.info_outline)),
             ],
           ),
           body: searchResultState.when(
@@ -64,7 +65,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       )),
                   Expanded(
                     child: ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 15.0.sp, horizontal: 15.0.sp),
+                      padding: EdgeInsets.symmetric(
+                          vertical: 15.0.sp, horizontal: 15.0.sp),
                       itemCount: datas?.length,
                       itemBuilder: (context, index) {
                         var dataku = datas![index];
@@ -101,7 +103,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       },
     );
     List<dynamic> listTrending = resp.data['results'];
-    List<Trending> myTrendings = listTrending.map((e) => Trending.fromJson(e)).toList();
+    List<Trending> myTrendings =
+        listTrending.map((e) => Trending.fromJson(e)).toList();
     setState(() {
       trendings = myTrendings;
       isLoading = false;

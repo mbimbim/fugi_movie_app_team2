@@ -1,14 +1,17 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fugi_movie_app_team2/src/common_config/app_theme.dart';
 import 'package:fugi_movie_app_team2/src/core/client/dio_client.dart';
+import 'package:fugi_movie_app_team2/src/features/home/domain/cast.dart';
 import 'package:fugi_movie_app_team2/src/features/home/domain/movie_detail.dart';
 import 'package:fugi_movie_app_team2/src/features/home/domain/trending.dart';
 import 'package:fugi_movie_app_team2/src/features/movie_detail/presentation/widgets/about_movie.dart';
 import 'package:fugi_movie_app_team2/src/features/movie_detail/presentation/widgets/cast.dart';
+import 'package:fugi_movie_app_team2/src/features/movie_detail/presentation/widgets/cast_card.dart';
 import 'package:fugi_movie_app_team2/src/features/movie_detail/presentation/widgets/movie_status.dart';
 import 'package:fugi_movie_app_team2/src/features/movie_detail/presentation/widgets/reviews.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,11 +21,13 @@ import 'package:palette_generator/palette_generator.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? idAndObject;
+  final Map<String, dynamic>? idAndObject2;
   final Trending? trending;
   const MovieDetailScreen({
     Key? key,
     this.trending,
     this.idAndObject,
+    this.idAndObject2,
   }) : super(key: key);
   static const routeName = 'movie-detail-screen';
 
@@ -32,14 +37,18 @@ class MovieDetailScreen extends StatefulWidget {
 
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
   MovieDetail detailMovie = const MovieDetail();
+
   bool isLoading = false;
   final List<PaletteColor> _colors = [];
   final int _currentIndex = 0;
+  List responseListCast = [];
+  int i = 0;
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    fetchDataCast();
   }
 
   void _updatePalettes(MovieDetail movieDetailResponse) async {
@@ -49,7 +58,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         'https://image.tmdb.org/t/p/w500/$x',
       ),
     );
-    _colors.add(generator.lightVibrantColor ?? generator.lightMutedColor ?? PaletteColor(Colors.teal, 2));
+    _colors.add(generator.lightVibrantColor ??
+        generator.lightMutedColor ??
+        PaletteColor(Colors.teal, 2));
     setState(() {});
   }
 
@@ -78,7 +89,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                           Container(
                             width: MediaQuery.of(context).size.width,
                             margin: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).size.height * .09.sp,
+                              bottom:
+                                  MediaQuery.of(context).size.height * .09.sp,
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
@@ -88,11 +100,14 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: _colors.isNotEmpty
-                                      ? _colors[_currentIndex].color.withOpacity(.3)
+                                      ? _colors[_currentIndex]
+                                          .color
+                                          .withOpacity(.3)
                                       : Colors.black.withOpacity(0.5),
                                   spreadRadius: 2.5.sp,
                                   blurRadius: 5.0.sp,
-                                  offset: const Offset(0, 2), // changes position of shadow
+                                  offset: const Offset(
+                                      0, 2), // changes position of shadow
                                 ),
                               ],
                               color: AppTheme.secondaryColor,
@@ -131,8 +146,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20.0.sp),
-                                                topRight: Radius.circular(20.0.sp),
+                                                topLeft:
+                                                    Radius.circular(20.0.sp),
+                                                topRight:
+                                                    Radius.circular(20.0.sp),
                                               ),
                                             ),
                                             padding: EdgeInsets.all(20.0.sp),
@@ -143,7 +160,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                                     }));
                               },
                               child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 15.0.sp, horizontal: 15.0.sp),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 15.0.sp, horizontal: 15.0.sp),
                                 width: 70.0.sp,
                                 height: 35.0.sp,
                                 decoration: BoxDecoration(
@@ -153,9 +171,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                                 ),
                                 child: Center(
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      const Icon(Icons.star_border, color: Colors.orange),
+                                      const Icon(Icons.star_border,
+                                          color: Colors.orange),
                                       Text('${detailMovie.voteAverage}',
                                           style: TextStyle(
                                             fontSize: 14.0.sp,
@@ -185,18 +205,23 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                                 Container(
                                   width: 75.0.sp,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10.0.sp),
+                                    borderRadius:
+                                        BorderRadius.circular(10.0.sp),
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            _colors.isNotEmpty ? _colors[_currentIndex].color.withOpacity(.5) : Colors.white,
+                                        color: _colors.isNotEmpty
+                                            ? _colors[_currentIndex]
+                                                .color
+                                                .withOpacity(.5)
+                                            : Colors.white,
                                         blurRadius: 10.0.sp,
                                         spreadRadius: 5.0.sp,
                                       ),
                                     ],
                                   ),
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.all(Radius.circular(10.0.sp)),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0.sp)),
                                     child: Image.network(
                                       'https://image.tmdb.org/t/p/w500/${detailMovie.posterPath}',
                                       fit: BoxFit.cover,
@@ -208,7 +233,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                                 Flexible(
                                   child: Column(
                                     children: [
-                                      SizedBox(height: Platform.isIOS ? 30.0.sp : 50.0.sp),
+                                      SizedBox(
+                                          height: Platform.isIOS
+                                              ? 30.0.sp
+                                              : 50.0.sp),
                                       Text(
                                         '${detailMovie.title}',
                                         style: TextStyle(
@@ -239,9 +267,15 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         children: [
                           MovieStatus(
                               icon: FontAwesomeIcons.calendarWeek,
-                              text: DateFormat('dd MMM yyyy').format(DateTime.parse(detailMovie.releaseDate.toString()))),
-                          MovieStatus(icon: FontAwesomeIcons.clock, text: '${detailMovie.runtime} min'),
-                          MovieStatus(icon: FontAwesomeIcons.ticket, text: '${detailMovie.genres?[0].name}'),
+                              text: DateFormat('dd MMM yyyy').format(
+                                  DateTime.parse(
+                                      detailMovie.releaseDate.toString()))),
+                          MovieStatus(
+                              icon: FontAwesomeIcons.clock,
+                              text: '${detailMovie.runtime} min'),
+                          MovieStatus(
+                              icon: FontAwesomeIcons.ticket,
+                              text: '${detailMovie.genres?[0].name}'),
                         ],
                       ),
                     ),
@@ -250,13 +284,14 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 Expanded(
                   flex: 2,
                   child: DefaultTabController(
-                    length: 3,
+                    length: 4,
                     child: Scaffold(
                       appBar: const TabBar(
                         tabs: [
                           Tab(child: Text('Reviews')),
                           Tab(child: Text('About Movie')),
                           Tab(child: Text('Production')),
+                          Tab(child: Text('Cast')),
                         ],
                       ),
                       body: TabBarView(
@@ -267,6 +302,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                           ),
                           Reviews(content: detailMovie.overview ?? '-'),
                           Cast(content: detailMovie.productionCompanies!),
+                          Cast_card(
+                            list_data: responseListCast,
+                          )
+                          // Cast(content: detailMovie.productionCompanies!),
                         ],
                       ),
                     ),
@@ -289,12 +328,41 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         queryParameters: {},
       );
       var respBody = resp.data;
+
       MovieDetail movieDetailResponse = MovieDetail.fromJson(respBody);
       setState(() {
         detailMovie = movieDetailResponse;
         isLoading = false;
       });
       _updatePalettes(movieDetailResponse);
+    } catch (e) {
+      Logger().e(e);
+    }
+  }
+
+  void fetchDataCast() async {
+    print('bima_id ${widget.idAndObject!['id']}');
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      var dio = Dio();
+      Response response = await dio.get(
+          'https://api.themoviedb.org/3/movie/${widget.idAndObject!['id']}/credits?api_key=0bdc72e416bdaf3386c89c511795fe9a&language=en-US');
+
+      responseListCast = response.data['cast'];
+
+      // List<Get_Cast> aa =
+      //     responseListCast.map((e) => Get_Cast.fromJson(e)).toList();
+
+      // print('bima2 ' + aa[0].name);
+
+      // for (i = 0; i < responseListCast.length; i++) {
+      //   print("bima " + responseListCast[i]['name']);
+      // }
+
+      isLoading = false;
     } catch (e) {
       Logger().e(e);
     }
@@ -315,10 +383,16 @@ class _WidgetSLiderState extends State<WidgetSLider> {
     return Column(
       children: [
         Text("Rate this Movie",
-            style: GoogleFonts.montserrat().copyWith(fontSize: 18, fontWeight: FontWeight.w400, color: AppTheme.thirdColor)),
+            style: GoogleFonts.montserrat().copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+                color: AppTheme.thirdColor)),
         const SizedBox(height: 20),
         Text('${double.parse(SliderValue.toStringAsFixed(1))}',
-            style: GoogleFonts.montserrat().copyWith(fontSize: 32, fontWeight: FontWeight.w400, color: AppTheme.thirdColor)),
+            style: GoogleFonts.montserrat().copyWith(
+                fontSize: 32,
+                fontWeight: FontWeight.w400,
+                color: AppTheme.thirdColor)),
         const SizedBox(height: 10),
         SliderTheme(
           data: const SliderThemeData(
@@ -327,7 +401,8 @@ class _WidgetSLiderState extends State<WidgetSLider> {
             overlayColor: Colors.amber,
             inactiveTrackColor: Colors.grey,
             thumbColor: Colors.white,
-            thumbShape: RoundSliderThumbShape(elevation: 10, enabledThumbRadius: 15),
+            thumbShape:
+                RoundSliderThumbShape(elevation: 10, enabledThumbRadius: 15),
             overlayShape: RoundSliderOverlayShape(overlayRadius: 20),
           ),
           // thumbColor: Colors.green,
@@ -359,7 +434,10 @@ class _WidgetSLiderState extends State<WidgetSLider> {
             color: const Color(0XFF0296E5),
             child: Center(
               child: Text("OK",
-                  style: GoogleFonts.montserrat().copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                  style: GoogleFonts.montserrat().copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white)),
             ),
           ),
         )
