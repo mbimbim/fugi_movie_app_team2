@@ -37,7 +37,7 @@ class Cast_card extends StatelessWidget {
                         )),
             ),
             SizedBox(
-              height: 12,
+              height: 10,
             ),
             Text('${list_data[index]['name']}')
           ],
