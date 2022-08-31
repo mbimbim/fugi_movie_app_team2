@@ -37,7 +37,7 @@ class Cast_card extends StatelessWidget {
                         )),
             ),
             SizedBox(
-              height: 10,
+              height: 12,
             ),
             Text('${list_data[index]['name']}')
           ],
@@ -49,45 +49,6 @@ class Cast_card extends StatelessWidget {
         //   ),
         // );
       },
-    )
-
-        //  GridView.count(
-        //     crossAxisCount: 2,
-
-        //     children: List.generate(
-        //       list_data.length,
-        //       (index) {
-        //         return Column(
-        //           children: [
-        //             Container(
-        //                 color: Colors.transparent,
-        //                 width: 150,
-        //                 height: 150,
-        //                 child: ClipRRect(
-        //                     borderRadius: BorderRadius.circular(100),
-        //                     child: Image.network(
-        //                       'https://image.tmdb.org/t/p/w92//gXKyT1YU5RWWPaE1je3ht58eUZr.jpg',
-        //                       fit: BoxFit.cover,
-        //                     )
-        //                     //  CachedNetworkImage(
-        //                     //   imageUrl:
-        //                     //       'https://image.tmdb.org/t/p/original/gXKyT1YU5RWWPaE1je3ht58eUZr.jpg',
-        //                     //   fit: BoxFit.cover,
-        //                     //   placeholder: (context, url) => Center(
-        //                     //     child: CircularProgressIndicator(),
-        //                     //   ),
-        //                     //   errorWidget: (context, url, error) => Icon(Icons.error),
-        //                     // ),
-        //                     )),
-        //             SizedBox(
-        //               height: 10,
-        //             ),
-        //             Text("Spider Man")
-        //           ],
-        //         );
-        //       },
-        //     ))
-
-        );
+    ));
   }
 }
